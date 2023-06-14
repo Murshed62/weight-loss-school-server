@@ -55,8 +55,9 @@ async function run() {
       const jwtToken=jwt.sign(user,process.env.ACCESS_TOKEN_SECRET,{expiresIn:'6h'})
       res.send({jwtToken})
     })
-
+// ================
     //verify admin
+// ================
     const verifyAdmin = async(req, res, next)=>{
       const email = req.decoded.email;
       const query = {email: email}
