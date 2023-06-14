@@ -4,6 +4,7 @@ const app = express();
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const port = process.env.PORT || 5000;
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // middleware
 
@@ -85,9 +86,9 @@ async function run() {
       res.send(result);
     })
 
-   // ==================================================
+// =================================
 // Admin get   db Section Part start
-// ============================================================
+// =================================
     app.get('/users/admin/:email', async (req, res)=>{
       const email = req.params?.email;
       
@@ -113,9 +114,9 @@ async function run() {
       res.send(result);
     })
 
-    // ==================================================
+// ==============================================
 // Instructor role update   db Section Part start
-// ============================================================
+// ==============================================
 
 app.get('/users/instructor/:email', async (req, res)=>{
   const email = req.params?.email;
@@ -141,8 +142,9 @@ app.patch('/users/instructor/:id',async(req,res)=>{
   const result=await usersCollection.updateOne(filter,updateDoc)
   res.send(result);
 })
-
+// =================
 // for student start
+// =================
 app.get('/users/student/:email', async (req, res)=>{
   const email = req.params?.email;
   
@@ -167,20 +169,20 @@ app.patch('/users/student/:id',async(req,res)=>{
   const result=await usersCollection.updateOne(filter,updateDoc)
   res.send(result)
 })
-
+// =====================
 // student section ended
+// =====================
 
 
 
 
-
-// ==================================================
+// ============================================
 // Instructor role update   db Section Part end
-// ============================================================
+// ============================================
 
-    // ==================================================
+    // =====================================
 // Admin role update   db Section Part start
-// ============================================================
+// =========================================
 
 app.patch('/users/admin/:id',async(req,res)=>{
   const id=req.params.id;
@@ -195,13 +197,13 @@ app.patch('/users/admin/:id',async(req,res)=>{
 })
 
 
-// ==================================================
+// =======================================
 // Admin role update   db Section Part end
-// ============================================================
+// =======================================
 
-// ==================================================
+// ===================================
 // Add a class   db Section Part start
-// ============================================================
+// ===================================
 app.post('/addclass', async(req,res)=>{
   const addClass = req.body;
   const result = await addClassCollection.insertOne(addClass);
@@ -251,9 +253,9 @@ app.get('/selectedClass/:id', async (req, res) => {
   res.send(result);
 });
 
-// ==================================================
+// ===========================================
 // Student Class Select get Section Part Start
-// ============================================================
+// ===========================================
 
 app.get('/selectedClass', async(req,res)=>{
   console.log(req.query.email);
@@ -283,9 +285,139 @@ app.delete('/selectedClass/:id',async(req,res)=>{
   }
  })
 
-// ==================================================
+// ==========================================
 //  Student Class Select get Section Part end
-// ============================================================
+// ==========================================
+
+// ==============================================
+// Payment get check user   db Section Part start
+// ==============================================
+
+
+app.get('/payments', async(req,res)=>{
+  const result= await paymentCollection.find().sort({date:-1}).toArray()
+  res.send(result);
+})
+
+// ============================================
+// Payment get check user   db Section Part end
+// ============================================
+
+
+
+// ======================================================
+// Payment post check user confirm  db Section Part start
+// ======================================================
+
+
+    app.post('/create-payment-intent',async(req,res)=>{
+       const {price}=req.body;
+       const amount=price*100;
+       const paymentIntent=await stripe.paymentIntents.create({
+        amount:amount,
+        currency:'usd',
+        payment_method_types:['card']
+       });
+       res.send({
+        clientSecret:paymentIntent.client_secret
+       })
+    })
+// ===================================================
+// Payment post check user confirm db Section Part end
+// ===================================================
+
+
+// ===================================
+// Payment post  db Section Part start
+// ===================================
+
+    app.post('/payments',async(req,res)=>{
+      const paymentsClass=req.body;
+   
+      const insetResult= await paymentCollection.insertOne(paymentsClass)
+   
+
+// ========================================================
+// Payment post  db my class data delete Section Part start
+// ========================================================
+
+      const deleteSelectedClass={
+        _id:new ObjectId(paymentsClass.payment?._id)
+      }
+      const deleteREsult=await selectedCollection.deleteOne(deleteSelectedClass)
+
+// ======================================================
+// Payment post  db my class data delete Section Part end
+// ======================================================
+
+
+// ======================================================================================
+// Payment post  db my update add classCollection add enrolled Student Section Part start
+// ======================================================================================
+
+const updateQuery={
+  _id:new ObjectId(paymentsClass.payment?.ClassId)
+}
+console.log(paymentsClass.payment?.ClassId);
+const updateSeatRs=await addClassCollection.updateOne(updateQuery,{
+  $inc:{enrolled:1}
+})
+
+// ====================================================================================
+// Payment post  db my update add classCollection add enrolled Student Section Part end
+// ====================================================================================
+
+
+// ===============================================================================
+// Payment post  db my update add classCollection AvailableSeat Section Part start
+// ===============================================================================
+const updateSelectQuery={
+  _id:new ObjectId(paymentsClass.payment?.ClassId)
+}
+const updateSelectRs=await addClassCollection.updateOne(updateSelectQuery,{
+  $inc:{AvailableSeat:-1}
+})
+// =============================================================================
+// Payment post  db my update add classCollection AvailableSeat Section Part end
+// =============================================================================
+
+// =======================================================================================
+// Payment post  db my update add userCollection student enroll db save Section Part start
+// =======================================================================================
+const classId=paymentsClass.payment?.ClassId;
+const query={_id:new ObjectId(classId)}
+const classData=await addClassCollection.findOne(query)
+const InstructorEmail=classData?.email;
+const updateInstructorQuery={email:InstructorEmail}
+const updateInstructorResult=await usersCollection.updateOne(updateInstructorQuery,{
+  $inc:{student:1}
+})
+
+// =====================================================================================
+// Payment post  db my update add userCollection student enroll db save Section Part end
+// =====================================================================================
+
+   
+      res.send({ insetResult,deleteREsult,updateSeatRs,updateSelectRs,updateInstructorResult})
+    })
+    
+
+// =================================
+// Payment post  db Section Part end
+// =================================
+
+// ==============
+// popular class
+// ============== 
+app.get('/popularclass', async(req,res)=>{
+  const result = await addClassCollection.find().sort({enrolled:-1}).limit(6).toArray();
+  res.send(result)
+})
+app.get('/popularinstructor', async(req,res)=>{
+  const result = await usersCollection.find({role:'instructor'}).sort({student:-1}).limit(6).toArray();
+  res.send(result)
+})
+
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
