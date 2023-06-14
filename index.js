@@ -348,9 +348,9 @@ app.get('/payments', async(req,res)=>{
 // Payment post  db my class data delete Section Part end
 // ======================================================
 
-// ======================================================================================
+// ===================================================================
 // Payment post  db my update add classCollection add enrolled Student Section Part start
-// ======================================================================================
+// ==================================================================
 
 const updateQuery={
   _id:new ObjectId(paymentsClass.payment?.ClassId)
@@ -360,14 +360,14 @@ const updateSeatRs=await addClassCollection.updateOne(updateQuery,{
   $inc:{enrolled:1}
 })
 
-// ====================================================================================
+// ===================================================================
 // Payment post  db my update add classCollection add enrolled Student Section Part end
-// ====================================================================================
+// ===================================================================
 
 
-// ===============================================================================
+// ============================================================================
 // Payment post  db my update add classCollection AvailableSeat Section Part start
-// ===============================================================================
+// ============================================================================
 const updateSelectQuery={
   _id:new ObjectId(paymentsClass.payment?.ClassId)
 }
@@ -378,9 +378,9 @@ const updateSelectRs=await addClassCollection.updateOne(updateSelectQuery,{
 // Payment post  db my update add classCollection AvailableSeat Section Part end
 // =============================================================================
 
-// =====================================================================================
+// ====================================================================
 // Payment post  db my update add userCollection student enroll db save Section Part start
-// =====================================================================================
+// ====================================================================
 const classId=paymentsClass.payment?.ClassId;
 const query={_id:new ObjectId(classId)}
 const classData=await addClassCollection.findOne(query)
@@ -390,9 +390,9 @@ const updateInstructorResult=await usersCollection.updateOne(updateInstructorQue
   $inc:{student:1}
 })
 
-// =====================================================================================
+// ====================================================================
 // Payment post  db my update add userCollection student enroll db save Section Part end
-// =====================================================================================
+// ====================================================================
 
       res.send({insetResult,deleteREsult,updateSeatRs,updateSelectRs,updateInstructorResult})
     })
