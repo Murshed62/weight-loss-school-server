@@ -45,7 +45,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     // Send a ping to confirm a successful connection
     //all collections
     const usersCollection = client.db('slimFitAcademy').collection('users');
@@ -375,7 +375,7 @@ const updateSelectQuery={
   _id:new ObjectId(paymentsClass.payment?.ClassId)
 }
 const updateSelectRs=await addClassCollection.updateOne(updateSelectQuery,{
-  $inc:{AvailableSeat:-1}
+  $inc:{seats:-1}
 })
 // =============================================================================
 // Payment post  db my update add classCollection AvailableSeat Section Part end
@@ -398,7 +398,7 @@ const updateInstructorResult=await usersCollection.updateOne(updateInstructorQue
 // =====================================================================================
 
    
-      res.send({ insetResult,deleteREsult,updateSeatRs,updateSelectRs,updateInstructorResult})
+      res.send({insetResult,deleteREsult,updateSeatRs,updateSelectRs,updateInstructorResult})
     })
     
 
