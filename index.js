@@ -378,9 +378,9 @@ const updateSelectRs=await addClassCollection.updateOne(updateSelectQuery,{
 // Payment post  db my update add classCollection AvailableSeat Section Part end
 // =============================================================================
 
-// =======================================================================================
+// =====================================================================================
 // Payment post  db my update add userCollection student enroll db save Section Part start
-// =======================================================================================
+// =====================================================================================
 const classId=paymentsClass.payment?.ClassId;
 const query={_id:new ObjectId(classId)}
 const classData=await addClassCollection.findOne(query)
@@ -394,11 +394,9 @@ const updateInstructorResult=await usersCollection.updateOne(updateInstructorQue
 // Payment post  db my update add userCollection student enroll db save Section Part end
 // =====================================================================================
 
-   
       res.send({insetResult,deleteREsult,updateSeatRs,updateSelectRs,updateInstructorResult})
     })
     
-
 // =================================
 // Payment post  db Section Part end
 // =================================
