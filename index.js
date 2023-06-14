@@ -418,6 +418,21 @@ app.get('/popularinstructor', async(req,res)=>{
   res.send(result)
 })
 
+app.put('/classesFeedback/:id',async(req,res)=>{
+  const id=req.params.id;
+  const filter={_id : new ObjectId(id)}
+  const updatedClasses=req.body;
+console.log(updatedClasses.feedback);
+  const updateDoc={
+    $set:{
+     feedback:updatedClasses?.feedback
+    }
+  }
+const result=await addClassCollection.updateOne(filter,updateDoc)
+res.send(result)
+
+})
+
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
