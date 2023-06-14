@@ -176,8 +176,6 @@ app.patch('/users/student/:id',async(req,res)=>{
 // =====================
 
 
-
-
 // ============================================
 // Instructor role update   db Section Part end
 // ============================================
@@ -305,8 +303,6 @@ app.get('/payments', async(req,res)=>{
 // Payment get check user   db Section Part end
 // ============================================
 
-
-
 // ======================================================
 // Payment post check user confirm  db Section Part start
 // ======================================================
@@ -351,7 +347,6 @@ app.get('/payments', async(req,res)=>{
 // ======================================================
 // Payment post  db my class data delete Section Part end
 // ======================================================
-
 
 // ======================================================================================
 // Payment post  db my update add classCollection add enrolled Student Section Part start
@@ -419,7 +414,9 @@ app.get('/popularinstructor', async(req,res)=>{
   const result = await usersCollection.find({role:'instructor'}).sort({student:-1}).limit(6).toArray();
   res.send(result)
 })
-
+// =============
+// user feedback
+// =============
 app.put('/classesFeedback/:id',async(req,res)=>{
   const id=req.params.id;
   const filter={_id : new ObjectId(id)}
