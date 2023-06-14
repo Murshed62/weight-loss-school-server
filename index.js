@@ -44,10 +44,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    // await client.connect();
-    // Send a ping to confirm a successful connection
-    //all collections
+    
     const usersCollection = client.db('slimFitAcademy').collection('users');
     const addClassCollection = client.db('slimFitAcademy').collection('addClass');
     const selectedCollection = client.db('slimFitAcademy').collection('selected');
